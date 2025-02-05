@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Unanet_POC</RootNamespace>
+    <UserSecretsId>1182bcb5-15b8-4069-8cbe-3e46a8cfa4a8</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
