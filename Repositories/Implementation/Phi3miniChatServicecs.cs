@@ -51,7 +51,104 @@ namespace Unanet_POC.Repositories.Implementation
         {
             var projects = _configuration.GetSection("Projects").Get<List<Project>>();
             string projectsString = JsonSerializer.Serialize(projects, new JsonSerializerOptions { WriteIndented = true });
-            string systemMessage = "You are an assistant that extracts multiple projects from a user's sentence and assigns the specific hours mentioned for each project. The response should be in JSON format as a list, where each object contains 'id', 'name', 'category', and 'hours'. The 'hours' field represents the number of hours the user mentioned for that project.\n\nYou will be given a predefined list of projects, and the user's input will contain project names along with hours worked. Match the mentioned projects and their corresponding hours to generate the response.\n\nIf no projects from the list match the user's sentence, return the string:\n\"No matches found\"\n\nExample project list:\n[\n  { \"id\": 1, \"name\": \"Library Management System\", \"category\": \"Web Development\" },\n  { \"id\": 2, \"name\": \"E-Commerce Website\", \"category\": \"Web Development\" }\n]\n\nExample user input:\n'I worked on the Library Management System for 5 hours and spent 3 hours developing an E-Commerce Website.'\n\nExpected response when matches are found:\n[\n  {\n    \"id\": 1,\n    \"name\": \"Library Management System\",\n    \"category\": \"Web Development\",\n    \"hours\": 5\n  },\n  {\n    \"id\": 2,\n    \"name\": \"E-Commerce Website\",\n    \"category\": \"Web Development\",\n    \"hours\": 3\n  }\n]\n\nExample user input with no matches:\n'I worked on a Machine Learning model for 5 hours.'\n\nExpected response when no matches are found:\n\"No matches found\" . This is the project list which is in json format you have to choose from here"+projectsString;
+            string exampleText = @"
+                    📝 Example User Inputs & Expected Outputs:
+                    ✅ Case 1: Matches Found (Multiple Projects)
+                    🔹 User Input:""I worked on the Library Management System for 5 hours and spent 3 hours on the E-Commerce Website.""
+                    ✅ Expected JSON Output:
+                    [
+                        {
+                        ""id"": 1,
+                        ""name"": ""Library Management System"",
+                        ""category"": ""Web Development"",
+                        ""hours"": 5
+                        },
+                        {
+                        ""id"": 2,
+                        ""name"": ""E-Commerce Website"",
+                        ""category"": ""Web Development"",
+                        ""hours"": 3
+                        }
+                    ]
+                    ✅ Case 2: Matches Found (Single Project)
+                    🔹 User Input:
+                    ""Today, I spent 6 hours working on the AI Chatbot.""
+                    ✅ Expected JSON Output:
+                    [
+                        {
+                        ""id"": 5,
+                        ""name"": ""AI Chatbot"",
+                        ""category"": ""Artificial Intelligence"",
+                        ""hours"": 6
+                        }
+                    ]
+                    ❌ Case 3: No Matches Found
+                    🔹 User Input:
+                    ""I worked on a Machine Learning model for 4 hours.""
+                    ✅ Expected JSON Output:
+                    []
+                    ✅ Case 4: Partial Matches (Only Recognized Projects Are Included)
+                    🔹 User Input:
+                    ""I spent 7 hours on the Mobile Banking App and 5 hours on a Data Science project.""
+                    ✅ Expected JSON Output:
+                    [
+                        {
+                        ""id"": 3,
+                        ""name"": ""Mobile Banking App"",
+                        ""category"": ""Mobile Development"",
+                        ""hours"": 7
+                        }
+                    ]
+                    ✅ Case 5: Different Wording for the Same Projects
+                    🔹 User Input:
+                    ""Worked on the Inventory Management System for about 8 hours today.""
+                    ✅ Expected JSON Output:
+                    [
+                        {
+                        ""id"": 4,
+                        ""name"": ""Inventory Management System"",
+                        ""category"": ""Software Development"",
+                        ""hours"": 8
+                        }
+                    ]
+                    ✅ Case 6: Projects Mentioned Without Hours
+                    🔹 User Input:
+                    ""I was involved in the Library Management System and the AI Chatbot today.""
+                    ✅ Expected JSON Output:
+                    []
+                    (Since no hours are mentioned, return an empty list.)
+                    ✅ Case 7: Hours Given Before Project Names
+                    🔹 User Input:
+                    ""Spent 5 hours today on the E-Commerce Website and 3 hours on the AI Chatbot.""
+                    ✅ Expected JSON Output:
+                    [
+                        {
+                        ""id"": 2,
+                        ""name"": ""E-Commerce Website"",
+                        ""category"": ""Web Development"",
+                        ""hours"": 5
+                        },
+                        {
+                        ""id"": 5,
+                        ""name"": ""AI Chatbot"",
+                        ""category"": ""Artificial Intelligence"",
+                        ""hours"": 3
+                        }
+                    ] 
+                    ";
+            String systemMessage = @"
+                    You are an AI assistant that extracts multiple projects from a user's sentence and assigns the specific hours mentioned for each project.  
+                    ### Instructions:  
+                    - You will receive a **predefined JSON list of projects**.  
+                    - Match the mentioned projects from the list and extract the corresponding **hours**.  
+                    - If multiple projects are mentioned, return all matched projects with their **hours**.  
+                    - If no projects from the list match, return an **empty JSON list (`[]`)**.  
+                    - The response must **always** be in **JSON format**.  
+                    ### Project List (Use This for Matching):  
+                    ```json
+                    "+projectsString+"```"+exampleText;
+            
+
             string userMeassage = speechText;
             var completion = await GetChatCompletion(systemMessage, userMeassage);
             return completion;
