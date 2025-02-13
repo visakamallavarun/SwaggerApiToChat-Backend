@@ -1,16 +1,8 @@
-﻿using Azure.AI.OpenAI;
-using Azure;
-using OpenAI.Chat;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+﻿using Azure;
 using Unanet_POC.Repositories.Interface;
-using Microsoft.Extensions.Configuration;
-using System.Text.Json.Nodes;
 using System.Text.Json;
 using Unanet_POC.DTO;
-using Azure.Identity;
 using Azure.AI.Inference;
-using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
-using System.Net;
 
 namespace Unanet_POC.Repositories.Implementation
 {
@@ -146,7 +138,9 @@ namespace Unanet_POC.Repositories.Implementation
                     - The response must **always** be in **JSON format**.  
                     ### Project List (Use This for Matching):  
                     ```json
-                    "+projectsString+"```"+exampleText;
+                    "+projectsString+"```"+
+                    @"### Example Text:"+
+                    exampleText;
             
 
             string userMeassage = speechText;

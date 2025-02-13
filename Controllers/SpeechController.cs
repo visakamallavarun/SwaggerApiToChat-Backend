@@ -103,8 +103,8 @@ namespace Unanet_POC.Controllers
             }
            
             var result = await phi3MiniChatService.selectProject(request.SpeechValue);
-
-            return Ok(result);
+            
+            return Ok(result.ToString());
         }
 
 
