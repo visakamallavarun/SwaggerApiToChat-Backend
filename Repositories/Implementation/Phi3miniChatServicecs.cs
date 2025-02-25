@@ -1,8 +1,8 @@
 ﻿using Azure;
 using Unanet_POC.Repositories.Interface;
 using System.Text.Json;
-using Unanet_POC.DTO;
 using Azure.AI.Inference;
+using Unanet_POC.Models.DTO;
 
 namespace Unanet_POC.Repositories.Implementation
 {

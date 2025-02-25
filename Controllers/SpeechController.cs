@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
 using System.Diagnostics;
-using Unanet_POC.Domain;
+using Unanet_POC.Models.DTO;
 using Unanet_POC.Repositories.Interface;
 
 namespace Unanet_POC.Controllers

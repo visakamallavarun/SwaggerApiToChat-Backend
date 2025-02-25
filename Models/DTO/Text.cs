@@ -1,4 +1,4 @@
-﻿namespace Unanet_POC.Domain
+﻿namespace Unanet_POC.Models.DTO
 {
     public class Text
     {

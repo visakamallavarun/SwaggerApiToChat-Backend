@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
-using Unanet_POC.DTO;
+using Unanet_POC.Models.DTO;
 using Unanet_POC.Repositories.Interface;
 
 namespace Unanet_POC.Controllers

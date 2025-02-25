@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace Unanet_POC.DTO
+namespace Unanet_POC.Models.DTO
 {
     public class SwaggerRequest
     {

@@ -1,4 +1,4 @@
-﻿namespace Unanet_POC.DTO
+﻿namespace Unanet_POC.Models.DTO
 {
     public class FeedbackRequest
     {
