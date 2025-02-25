@@ -12,6 +12,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IConvertSpeechToTextRepository, ConvertSpeechToTextRepository>();
 builder.Services.AddScoped<IPhi3miniChatService, Phi3miniChatServicecs>();
+builder.Services.AddScoped<ISwaggerService, SwaggerService>();
+
 
 builder.Services.AddCors(options =>
 {
