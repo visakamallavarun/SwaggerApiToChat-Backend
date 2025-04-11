@@ -1,8 +1,4 @@
-using Azure.Core;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CognitiveServices.Speech;
-using Microsoft.CognitiveServices.Speech.Audio;
-using System.Diagnostics;
 using Unanet_POC.Models.DTO;
 using Unanet_POC.Repositories.Interface;
 
@@ -28,7 +24,7 @@ namespace Unanet_POC.Controllers
         [HttpGet("get-speech-token")]
         public async Task<IActionResult> GetSpeechToken()
         {
-            string speechKey = _configuration["AzureAI:ApiKey"];
+            string speechKey = _configuration["AzureAI:SpeechApiKey"];
             string speechRegion = _configuration["AzureAI:Region"];
 
             if (string.IsNullOrWhiteSpace(speechKey) || string.IsNullOrWhiteSpace(speechRegion))
@@ -57,53 +53,14 @@ namespace Unanet_POC.Controllers
             }
         }
 
-
-        [HttpPost("transcribe")]
-        public async Task<IActionResult> TranscribeAudio(IFormFile file)
+        [HttpPost("UnifiedChatbotHandler")]
+        public async Task<IActionResult> UnifiedChatbotHandler([FromBody] SwaggerChatRequest swaggerChatRequest)
         {
-            if (file == null || file.Length == 0)
-                return BadRequest("Please upload a valid .wav file.");
-
-            if (Path.GetExtension(file.FileName).ToLower() != ".wav")
-                return BadRequest("Only .wav files are supported.");
-
-            // Save the uploaded file to a temporary location
-            var filePath = Path.GetTempFileName();
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            try
-            {
-                var result = await convertSpeechToTextRepository.ConvertSpeechToText(filePath);
-                var selectedProject = await phi3MiniChatService.selectProject(result);
-                return Ok( selectedProject );
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error processing audio: {ex.Message}");
-            }
-            finally
-            {
-                // Clean up temp file
-                if (System.IO.File.Exists(filePath))
-                {
-                    System.IO.File.Delete(filePath);
-                }
-            }
-        }
-
-        [HttpPost("selectProject")]
-        public async Task<IActionResult> SelectProject([FromBody] Text request)
-        {
-            if(request == null || string.IsNullOrWhiteSpace(request.SpeechValue))
+            if (swaggerChatRequest.Text == null || string.IsNullOrWhiteSpace(swaggerChatRequest.Text))
             {
                 return BadRequest("Please provide a valid text.");
             }
-           
-            var result = await phi3MiniChatService.selectProject(request.SpeechValue);
-            
+            var result = await phi3MiniChatService.UnifiedChatbotHandler(swaggerChatRequest.Text, swaggerChatRequest.SwaggerJson);
             return Ok(result.ToString());
         }
 

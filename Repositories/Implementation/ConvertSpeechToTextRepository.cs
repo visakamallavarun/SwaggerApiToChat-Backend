@@ -11,7 +11,7 @@ namespace Unanet_POC.Repositories.Implementation
 
         public ConvertSpeechToTextRepository(IConfiguration configuration)
         {
-            _speechKey = configuration["AzureAI:ApiKey"];
+            _speechKey = configuration["AzureAI:SpeechApiKey"];
             _speechRegion = configuration["AzureAI:Region"];
         }
         public async Task<string> ConvertSpeechToText(string filePath)

@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using Unanet_POC.Data;
 using Unanet_POC.Repositories.Implementation;
 using Unanet_POC.Repositories.Interface;
 
@@ -13,14 +11,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
-
 builder.Services.AddScoped<IConvertSpeechToTextRepository, ConvertSpeechToTextRepository>();
 builder.Services.AddScoped<IPhi3miniChatService, Phi3miniChatServicecs>();
-builder.Services.AddScoped<ISwaggerService, SwaggerService>();
 
 builder.Services.AddCors(options =>
 {
