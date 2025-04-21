@@ -6,6 +6,6 @@ namespace Unanet_POC.Repositories.Interface
 {
     public interface IPhi3miniChatService
     {
-        Task<string> UnifiedChatbotHandler(string userInput, JsonElement swaggerJson);
+        Task<chatResponse> UnifiedChatbotHandler(string userInput, JsonElement swaggerJson);
     }
 }

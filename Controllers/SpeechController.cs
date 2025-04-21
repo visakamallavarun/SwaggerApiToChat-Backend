@@ -61,7 +61,7 @@ namespace Unanet_POC.Controllers
                 return BadRequest("Please provide a valid text.");
             }
             var result = await phi3MiniChatService.UnifiedChatbotHandler(swaggerChatRequest.Text, swaggerChatRequest.SwaggerJson);
-            return Ok(result.ToString());
+            return Ok(result);
         }
 
 
