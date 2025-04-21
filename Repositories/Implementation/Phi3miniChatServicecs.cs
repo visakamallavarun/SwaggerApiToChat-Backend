@@ -7,6 +7,7 @@ using System.Text;
 using Microsoft.CognitiveServices.Speech.Transcription;
 using Microsoft.IdentityModel.Tokens;
 using Unanet_POC.Models;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 
 namespace Unanet_POC.Repositories.Implementation
 {
@@ -206,12 +207,70 @@ namespace Unanet_POC.Repositories.Implementation
             return llmResponse.Value.Content;
         }
 
-        public Task<List<string>> generateActionList(JsonElement jsonElement)
+        public async Task<List<string>> generateActionList(JsonElement jsonElement)
         {
-            throw new NotImplementedException();
+            string systemPrompt = @"
+                You are a smart assistant that analyzes Swagger (OpenAPI 3.0) specifications and generates clear, user-friendly action descriptions based on the available API operations and metadata.
+
+                Your task is to:
+                - Understand the structure of the Swagger JSON, including paths, operations (GET, POST, PUT, DELETE), and general API metadata (title, version, authentication, etc.).
+                - Generate a list of natural language prompts that describe what users can do with the API, such as 'Create a new lead' or 'Get details of a lead by ID'.
+                - Include both operation-based actions (like creating or updating resources) and general information actions (like asking about the API version or authentication method).
+                - Keep the descriptions simple, concise, and helpful — avoid technical jargon where possible.
+                - Only include actions that can be directly derived from the Swagger JSON (do not infer or invent new capabilities).
+
+                Format your response as a raw JSON array of strings — no objects, no wrapping keys, just the array.
+                This format must match exactly what can be deserialized into a C# List<string>.
+
+                Response JSON format:
+                {
+                    ""Action"": [
+                    ""Create a new lead"",
+                    ""List all leads"",
+                    ""What is this API about?"",
+                    ""Show the API version""
+                ]
+                }
+                
+
+                Now, given the following Swagger JSON, generate the appropriate list of actions:
+                <insert swagger JSON here>
+                ";
+
+            var requestOptions = new ChatCompletionsOptions()
+            {
+                Messages =
+                    {
+                        new ChatRequestSystemMessage(systemPrompt),
+                        new ChatRequestUserMessage($"Swagger JSON: {jsonElement}")
+                    },
+                Model = _modelName,
+                Temperature = 0.0f,
+                NucleusSamplingFactor = 1.0f,
+                FrequencyPenalty = 0.0f,
+                PresencePenalty = 0.0f,
+                ResponseFormat = new ChatCompletionsResponseFormatJSON()
+            };
+
+            Response<ChatCompletions> llmResponse = await client.CompleteAsync(requestOptions);
+            string jsonContent = llmResponse.Value.Content;
+
+            ActionResponse? actions;
+            try
+            {
+                actions = JsonSerializer.Deserialize<ActionResponse>(jsonContent);
+            }
+            catch (Exception ex)
+            {
+                return new List<string>();
+            }
+
+            return actions.Action ?? new List<string>();
+
         }
     }
 }
+
 
 
 
