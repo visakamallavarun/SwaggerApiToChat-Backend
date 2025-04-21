@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 using Unanet_POC.Models.DTO;
 using Unanet_POC.Repositories.Interface;
 
@@ -8,14 +9,12 @@ namespace Unanet_POC.Controllers
     [ApiController]
     public class SpeechController : ControllerBase
     {
-        private readonly IConvertSpeechToTextRepository convertSpeechToTextRepository;
         private readonly IPhi3miniChatService phi3MiniChatService;
         private readonly IConfiguration _configuration;
         private readonly HttpClient _httpClient;
 
-        public SpeechController(IConvertSpeechToTextRepository convertSpeechToTextRepository,IPhi3miniChatService phi3MiniChatService, IConfiguration configuration, HttpClient httpClient)
+        public SpeechController(IPhi3miniChatService phi3MiniChatService, IConfiguration configuration, HttpClient httpClient)
         {
-            this.convertSpeechToTextRepository = convertSpeechToTextRepository;
             this.phi3MiniChatService = phi3MiniChatService;
             _configuration = configuration;
             _httpClient = httpClient;
@@ -61,6 +60,20 @@ namespace Unanet_POC.Controllers
                 return BadRequest("Please provide a valid text.");
             }
             var result = await phi3MiniChatService.UnifiedChatbotHandler(swaggerChatRequest.Text, swaggerChatRequest.SwaggerJson);
+            return Ok(result);
+        }
+
+        [HttpPost("Actions")]
+        public async Task<IActionResult> GetAllActions([FromBody] JsonElement SwaggerJson)
+        {
+            if (SwaggerJson.ValueKind == JsonValueKind.Undefined ||
+        SwaggerJson.ValueKind == JsonValueKind.Null ||
+        (SwaggerJson.ValueKind == JsonValueKind.Object && SwaggerJson.EnumerateObject().Count() == 0))
+            {
+                return BadRequest("Swagger JSON is empty or invalid.");
+            }
+
+            var result = await phi3MiniChatService.generateActionList(SwaggerJson);
             return Ok(result);
         }
 

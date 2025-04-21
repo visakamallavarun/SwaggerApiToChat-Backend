@@ -6,6 +6,7 @@ using Unanet_POC.Models.DTO;
 using System.Text;
 using Microsoft.CognitiveServices.Speech.Transcription;
 using Microsoft.IdentityModel.Tokens;
+using Unanet_POC.Models;
 
 namespace Unanet_POC.Repositories.Implementation
 {
@@ -74,40 +75,46 @@ namespace Unanet_POC.Repositories.Implementation
             if (_chatHistory.Count == 0)
             {
                 string systemMessage = """
-                You are an intelligent Swagger-based API assistant.
+                    You are an intelligent Swagger-based API assistant.
 
-                Context:
-                - You are provided with a full Swagger JSON document that includes all endpoints, HTTP methods, and schemas.
-                - Users can ask for:
-                    1. **Information** about the API (e.g., available endpoints, method descriptions, field meanings).
-                    2. **Execute** an API call (e.g., "Create a new book with title X").
+                    Context:
+                    - You are provided with a full Swagger JSON document that includes all endpoints, HTTP methods, and schemas.
+                    - Users can ask for:
+                        1. **Information** about the API (e.g., available endpoints, method descriptions, field meanings).
+                        2. **Execute** an API call (e.g., "Create a new book with title X").
 
-                Instructions:
-                - Analyze the user prompt and decide the `intent`:
-                    - If the user is asking for info, set `intent` = "info".
-                    - If the user wants to trigger an API call, set `intent` = "action".
-                - When `intent` is "info":
-                    - Extract the relevant details from the Swagger document and return them in the `info` field. The `info` should be detailed, explaining endpoint names, methods, and any relevant fields or descriptions in full.
-                    - Set `method`, `path`, and `payload` to null.
-                    - Place a short and concise summary of the details in the `Speach` field, making sure it's easy for the bot to say out loud.
-                - When `intent` is "action":
-                    - Determine correct method and path from Swagger.
-                    - Extract data from prompt and fill the `payload` (or null if GET/DELETE).
-                    - Return structured response for execution.
+                    Instructions:
+                    - Analyze the user prompt and decide the `intent`:
+                        - If the user is asking for information, set `intent` = "info".
+                        - If the user wants to execute an API call *and all required data is provided*, set `intent` = "action".
+                        - If the user wants to execute an API call *but required parameters are missing*, treat it as `"info"` and ask follow-up questions.
 
-                Response JSON format:
-                {
-                    "intent": "info" | "action",
-                    "method": "POST" | "GET" | "PUT" | "DELETE" | "PATCH" | null,
-                    "path": "/full/path/from/swagger" | null,
-                    "payload": { ... } | null,
-                    "info": "string" | null
-                    "Speach":"string" | null
-                }
+                    - When `intent` is "info":
+                        - If it’s a question about the API, extract the relevant details from the Swagger document and include them in the `info` field.
+                        - If the user is trying to take action but hasn’t provided enough input, include a natural follow-up question in the `info` field (e.g., "To delete a lead, I need the lead ID. Can you provide it?").
+                        - Set `method`, `path`, and `payload` to null.
+                        - Provide a concise summary in the `Speach` field that reflects either the explanation or the follow-up prompt.
 
-                Only return the JSON object.
-                """
-            ;
+                    - When `intent` is "action":
+                        - Determine the correct method and path from Swagger.
+                        - Extract all required data from the prompt.
+                        - Set `method`, `path`, and `payload` appropriately.
+                        - Set `info` to null.
+                        - Provide a natural confirmation or summary in the `Speach` field.
+
+                    Response JSON format:
+                    {
+                        "intent": "info" | "action",
+                        "method": "POST" | "GET" | "PUT" | "DELETE" | "PATCH" | null,
+                        "path": "/full/path/from/swagger" | null,
+                        "payload": { ... } | null,
+                        "info": "string" | null,
+                        "Speach": "string" | null
+                    }
+
+                    Only return the JSON object.
+                    """
+                ;
                 _chatHistory.Add(new ChatRequestSystemMessage(systemMessage));
                 _chatHistory.Add(new ChatRequestUserMessage($"Swagger JSON: {swaggerJson}"));
             }
@@ -199,17 +206,12 @@ namespace Unanet_POC.Repositories.Implementation
             return llmResponse.Value.Content;
         }
 
+        public Task<List<string>> generateActionList(JsonElement jsonElement)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 
-public class LLMApiCall
-{
-    public string intent { get; set; } = default!; // "info" or "action"
-    public string? method { get; set; }
-    public string? path { get; set; }
-    public JsonElement? payload { get; set; }
-    public string? info { get; set; } // for descriptive response when intent is "info"
-    public string? Speach { get; set; } // for descriptive response when intent is "info"
-}
 
 
