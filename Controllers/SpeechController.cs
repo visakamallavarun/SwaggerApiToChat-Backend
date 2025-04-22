@@ -77,6 +77,20 @@ namespace Unanet_POC.Controllers
             return Ok(result);
         }
 
+        [HttpPost]
+        public IActionResult StoreQueryParams([FromBody] QueryParamsDto dto)
+        {
+            if (dto == null || dto.Params == null)
+            {
+                return BadRequest("Invalid query parameters.");
+            }
+
+            // Replace or add new values
+            phi3MiniChatService.setParamValues(dto);
+
+            return Ok();
+        }
+
 
     }
 

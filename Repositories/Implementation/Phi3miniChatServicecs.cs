@@ -8,6 +8,7 @@ using Microsoft.CognitiveServices.Speech.Transcription;
 using Microsoft.IdentityModel.Tokens;
 using Unanet_POC.Models;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Unanet_POC.Repositories.Implementation
 {
@@ -22,6 +23,8 @@ namespace Unanet_POC.Repositories.Implementation
 
         private readonly List<ChatRequestMessage> _chatHistory = new();
 
+        private string Params { get; set; }
+        //api_token=cd37c62ccaa1c36afc7a22b8edc929b79e8cc57d
 
         // Add a message history to store previous interactions
         public Phi3miniChatServicecs(IConfiguration configuration, HttpClient httpClient)
@@ -36,6 +39,13 @@ namespace Unanet_POC.Repositories.Implementation
             client = new ChatCompletionsClient(endpointURI, credential, new AzureAIInferenceClientOptions());
         }
 
+        public void setParamValues(QueryParamsDto dto)
+        {
+            Params = string.Join("&", dto.Params.Select(kvp =>
+                $"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(kvp.Value)}"));
+        }
+
+
         private async Task<string> SendRequestToApi(string endpointWithMethod, string? payload = null)
         {
             if (string.IsNullOrWhiteSpace(endpointWithMethod))
@@ -47,7 +57,7 @@ namespace Unanet_POC.Repositories.Implementation
 
             var method = parts[0].ToUpperInvariant();
             var path = parts[1];
-            var url = $"https://api.pipedrive.com/v1{path}/?api_token=cd37c62ccaa1c36afc7a22b8edc929b79e8cc57d";
+            var url = $"https://api.pipedrive.com/v1{path}/?{Params}";
 
             var request = new HttpRequestMessage(new HttpMethod(method), url);
 

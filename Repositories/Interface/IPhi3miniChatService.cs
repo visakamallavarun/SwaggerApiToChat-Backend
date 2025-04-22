@@ -8,5 +8,6 @@ namespace Unanet_POC.Repositories.Interface
     {
         Task<chatResponse> UnifiedChatbotHandler(string userInput, JsonElement swaggerJson);
         Task<List<string>> generateActionList(JsonElement jsonElement);
+        void setParamValues(QueryParamsDto dto);
     }
 }
