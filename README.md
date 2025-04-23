@@ -1,8 +1,8 @@
-# Unanet POC - API Intelligence Application
+# SwaggerApiToChat - API Intelligence Application
 
 ## Overview
 
-The **Unanet POC Application** is a .NET 8-based web application that leverages Azure OpenAI services to provide intelligent API interaction capabilities. It enables users to interact with APIs using natural language, dynamically analyzing Swagger/OpenAPI specifications to simplify complex API operations.
+The **SwaggerApiToChat Application** is a .NET 8-based web application that leverages Azure OpenAI services to provide intelligent API interaction capabilities. It enables users to interact with APIs using natural language, dynamically analyzing Swagger/OpenAPI specifications to simplify complex API operations.
 
 ---
 
