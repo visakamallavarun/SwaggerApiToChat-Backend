@@ -111,7 +111,7 @@ namespace Unanet_POC.Repositories.Implementation
                         - Extract all required data from the prompt.
                         - Set `method`, `path`, and `payload` appropriately.
                         - Set `info` to null.
-                        - Provide a natural confirmation or summary in the `Speach` field.
+                        - Provide a clear, action-based summary in the `Speach` field describing what operation is being performed (e.g., "Book created successfully", "User updated", "Invoice submitted"). The Speach should reflect the outcome of the action being performed, not a confirmation or request.
 
                     Response JSON format:
                     {
