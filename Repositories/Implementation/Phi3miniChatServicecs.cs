@@ -121,7 +121,7 @@ namespace Unanet_POC.Repositories.Implementation
 
                     - When `intent` is "info":
                         - If it’s a question about the API, extract the relevant details from the Swagger document and include them in the `info` field.
-                        - If the user is trying to take action but hasn’t provided enough input, include a natural follow-up question in the `info` field.
+                        - If the user is trying to take action but hasn’t provided enough input, check for data in the chat history and perform that action if not present include a natural follow-up question in the `info` field.
                         - Set `method`, `path`, and `payload` to null.
                         - Provide a concise summary in the `Speach` field that reflects either the explanation or the follow-up prompt.
 
@@ -232,6 +232,8 @@ namespace Unanet_POC.Repositories.Implementation
             };
 
             Response<ChatCompletions> llmResponse = await client.CompleteAsync(requestOptions);
+
+            _chatHistory.Add(new ChatRequestUserMessage(response));
 
             return llmResponse.Value.Content;
         }
