@@ -77,7 +77,7 @@ namespace Unanet_POC.Controllers
             return Ok(result);
         }
 
-        [HttpPost]
+        [HttpPost("store-query-params")]
         public IActionResult StoreQueryParams([FromBody] QueryParamsDto dto)
         {
             if (dto == null || dto.Params == null)
@@ -86,12 +86,32 @@ namespace Unanet_POC.Controllers
             }
 
             // Replace or add new values
-            phi3MiniChatService.setParamValues(dto);
+            phi3MiniChatService.SetQueryParameters(dto);
 
             return Ok();
         }
 
+        [HttpPost("store-header-params")]
+        public IActionResult StoreHeaderParams([FromBody] HeaderParamsDto dto)
+        {
+            if (dto == null || dto.Params == null)
+            {
+                return BadRequest("Invalid query parameters.");
+            }
 
+            // Replace or add new values
+            phi3MiniChatService.setHeaderParamValues(dto);
+
+            return Ok();
+        }
+
+        [HttpPost("store-url-path")]
+        public IActionResult StoreURLPath([FromBody] string URL)
+        {
+            // Replace or add new values
+            phi3MiniChatService.setURLPath(URL);
+
+            return Ok();
+        }
     }
-
 }

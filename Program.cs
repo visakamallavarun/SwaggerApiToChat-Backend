@@ -11,6 +11,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 
+//todo
 builder.Services.AddSingleton<IPhi3miniChatService, Phi3miniChatServicecs>();
 
 builder.Services.AddCors(options =>

@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using Unanet_POC.Models;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc;
+using System.Reflection.PortableExecutable;
 
 namespace Unanet_POC.Repositories.Implementation
 {
@@ -23,8 +24,12 @@ namespace Unanet_POC.Repositories.Implementation
 
         private readonly List<ChatRequestMessage> _chatHistory = new();
 
+        private string urlPath { get; set; } = "https://api.pipedrive.com/v1";
+
         private string Params { get; set; }
         //api_token=cd37c62ccaa1c36afc7a22b8edc929b79e8cc57d
+
+        private Dictionary<string, string> Headers { get; set; } = new();
 
         // Add a message history to store previous interactions
         public Phi3miniChatServicecs(IConfiguration configuration, HttpClient httpClient)
@@ -39,12 +44,21 @@ namespace Unanet_POC.Repositories.Implementation
             client = new ChatCompletionsClient(endpointURI, credential, new AzureAIInferenceClientOptions());
         }
 
-        public void setParamValues(QueryParamsDto dto)
+        public void SetQueryParameters(QueryParamsDto dto)
         {
             Params = string.Join("&", dto.Params.Select(kvp =>
                 $"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(kvp.Value)}"));
         }
 
+        public void setHeaderParamValues(HeaderParamsDto dto)
+        {
+            Headers = dto.Params;
+        }
+
+        public void setURLPath(string url)
+        {
+            this.urlPath = url;
+        }
 
         private async Task<string> SendRequestToApi(string endpointWithMethod, string? payload = null)
         {
@@ -57,9 +71,14 @@ namespace Unanet_POC.Repositories.Implementation
 
             var method = parts[0].ToUpperInvariant();
             var path = parts[1];
-            var url = $"https://api.pipedrive.com/v1{path}/?{Params}";
+            var url = $"{urlPath}{path}/?{Params}";
 
             var request = new HttpRequestMessage(new HttpMethod(method), url);
+
+            foreach (var header in Headers)
+            {
+                request.Headers.TryAddWithoutValidation(header.Key, header.Value);
+            }
 
             if (payload != null && method is "POST" or "PUT" or "PATCH")
             {
@@ -102,7 +121,7 @@ namespace Unanet_POC.Repositories.Implementation
 
                     - When `intent` is "info":
                         - If it’s a question about the API, extract the relevant details from the Swagger document and include them in the `info` field.
-                        - If the user is trying to take action but hasn’t provided enough input, include a natural follow-up question in the `info` field (e.g., "To delete a lead, I need the lead ID. Can you provide it?").
+                        - If the user is trying to take action but hasn’t provided enough input, include a natural follow-up question in the `info` field.
                         - Set `method`, `path`, and `payload` to null.
                         - Provide a concise summary in the `Speach` field that reflects either the explanation or the follow-up prompt.
 
@@ -278,6 +297,7 @@ namespace Unanet_POC.Repositories.Implementation
             return actions.Action ?? new List<string>();
 
         }
+
     }
 }
 
