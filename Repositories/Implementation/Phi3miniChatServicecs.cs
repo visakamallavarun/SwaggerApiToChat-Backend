@@ -307,13 +307,6 @@ namespace Unanet_POC.Repositories.Implementation
 
 
             string systemPrompt = "You are an intelligent image analysis assistant. Extract the text from this image and output valid JSON (flat hierarchy).";
-       
-
-            // Build the message content list
-            var userContent = new List<ChatMessageContentItem>
-{
-    new ChatMessageImageContentItem(imageUri)
-};
 
             // Construct the ChatCompletionsOptions
             var options = new ChatCompletionsOptions
@@ -321,7 +314,7 @@ namespace Unanet_POC.Repositories.Implementation
                 Messages = new List<ChatRequestMessage>
     {
         new ChatRequestSystemMessage(systemPrompt),
-        new ChatRequestUserMessage(userContent)
+        new ChatRequestUserMessage(new ChatMessageImageContentItem(imageUri))
     },
                 Model = _modelName, // your deployed model name, e.g. "gpt-4-vision-preview"
                 Temperature = 0.0f,
