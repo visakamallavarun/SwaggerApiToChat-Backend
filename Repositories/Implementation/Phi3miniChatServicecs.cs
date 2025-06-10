@@ -300,6 +300,45 @@ namespace Unanet_POC.Repositories.Implementation
 
         }
 
+        public async Task<string> GenerateTextFromImageUrl(string imageUrl)
+        {
+          
+            Uri imageUri = new Uri(imageUrl);
+
+
+            string systemPrompt = "You are an intelligent image analysis assistant. Extract the text from this image and output valid JSON (flat hierarchy).";
+       
+
+            // Build the message content list
+            var userContent = new List<ChatMessageContentItem>
+{
+    new ChatMessageImageContentItem(imageUri)
+};
+
+            // Construct the ChatCompletionsOptions
+            var options = new ChatCompletionsOptions
+            {
+                Messages = new List<ChatRequestMessage>
+    {
+        new ChatRequestSystemMessage(systemPrompt),
+        new ChatRequestUserMessage(userContent)
+    },
+                Model = _modelName, // your deployed model name, e.g. "gpt-4-vision-preview"
+                Temperature = 0.0f,
+                NucleusSamplingFactor = 1.0f,
+                FrequencyPenalty = 0.0f,
+                PresencePenalty = 0.0f,
+                ResponseFormat = new ChatCompletionsResponseFormatJSON()
+            };
+
+
+            // Call the LLM with the updated request options
+            Response<ChatCompletions> response = await client.CompleteAsync(options);
+
+            // Return the generated text content
+            return response.Value.Content;
+        }
+
     }
 }
 

@@ -8,8 +8,10 @@ namespace Unanet_POC.Repositories.Interface
     {
         Task<chatResponse> UnifiedChatbotHandler(string userInput, JsonElement swaggerJson);
         Task<List<string>> generateActionList(JsonElement jsonElement);
+        Task<string> GenerateTextFromImageUrl(string imageUrl);
         void SetQueryParameters(QueryParamsDto dto);
         void setHeaderParamValues(HeaderParamsDto dto);
         void setURLPath(string url);
+
     }
 }

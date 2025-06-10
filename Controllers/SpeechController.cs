@@ -52,6 +52,17 @@ namespace Unanet_POC.Controllers
             }
         }
 
+        [HttpGet("ImageURLToText")]
+        public async Task<IActionResult> ImageURLToText([FromQuery] string imageUrl)
+        {
+            if (string.IsNullOrWhiteSpace(imageUrl))
+            {
+                return BadRequest("Please provide a valid image URL.");
+            }
+            var result = await phi3MiniChatService.GenerateTextFromImageUrl(imageUrl);
+            return Ok(result);
+        }
+
         [HttpPost("UnifiedChatbotHandler")]
         public async Task<IActionResult> UnifiedChatbotHandler([FromBody] SwaggerChatRequest swaggerChatRequest)
         {
