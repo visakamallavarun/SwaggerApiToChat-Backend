@@ -4,12 +4,7 @@ using System.Text.Json;
 using Azure.AI.Inference;
 using Unanet_POC.Models.DTO;
 using System.Text;
-using Microsoft.CognitiveServices.Speech.Transcription;
-using Microsoft.IdentityModel.Tokens;
 using Unanet_POC.Models;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.AspNetCore.Mvc;
-using System.Reflection.PortableExecutable;
 
 namespace Unanet_POC.Repositories.Implementation
 {
